@@ -261,6 +261,11 @@ int main(int argc, char **argv)
 	last_tv.tv_sec  = 0;
 	last_tv.tv_usec = 0;
 
+	gps_thread = pthread_create(&getGPS_thread ,NULL ,(void *)get_gps ,NULL);
+	if (gps_thread != 0){
+		perror("Can't start GPS thread");
+		return 1;
+	}
 	while ((opt = getopt(argc, argv, "t:HciaSs:lDdxLn:r:heT:?")) != -1) {
 		switch (opt) {
 		case 't':
@@ -707,19 +712,16 @@ int main(int argc, char **argv)
 				if (frame.can_id & CAN_EFF_FLAG)
 					view |= CANLIB_VIEW_INDENT_SFF;
 
-				gps_thread = pthread_create(&getGPS_thread ,NULL ,(void *)get_gps ,NULL);
-				if (gps_thread != 0){
-					perror("Can't start GPS thread");
-					return 1;
-				}
 				if (log) {
 					char buf[CL_CFSZ]; /* max length */
 
 					/* log CAN frame with absolute timestamp & device */
 					sprint_canframe(buf, &frame, 0, maxdlen);
-					fprintf(logfile, "(%010ld.%06ld) %*s %s\n",
+					fprintf(logfile, "%010ld.%06ld %*s %s %f\n",
 						tv.tv_sec, tv.tv_usec,
-						max_devname_len, devname[idx], buf);
+						max_devname_len, devname[idx], buf,
+					        gps_info.time	
+						);
 				}
 
 				if ((logfrmt) && (silent == SILENT_OFF)){
