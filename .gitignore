@@ -1,3 +1,4 @@
 #ignore .o file
 *.o
 *.swp
+*.log

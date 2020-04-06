@@ -1,43 +1,11 @@
-/* SPDX-License-Identifier: (GPL-2.0-only OR BSD-3-Clause) */
 /*
- * candump.c
- * * Copyright (c) 2002-2009 Volkswagen Group Electronic Research
- * All rights reserved.
+ * can_gpsdump.c
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name of Volkswagen nor the names of its contributors
- *    may be used to endorse or promote products derived from this software
- *    without specific prior written permission.
+ * reModeled by Atsuto Ishinaga
+ * This program is dump can packets infomation and GPS infomation.
  *
- * Alternatively, provided that this notice is retained in full, this
- * software may be distributed under the terms of the GNU General
- * Public License ("GPL") version 2, in which case the provisions of the
- * GPL apply INSTEAD OF those given above.
- *
- * The provided data structures and external interfaces from this code
- * are not restricted to be used by modules with a GPL compatible license.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
- *
- * Send feedback to <linux-can@vger.kernel.org>
+ * How to compile;
+ * gcc -o candump.o -pthread candump.c -lm -lgps
  *
  */
 
@@ -59,8 +27,7 @@
 void get_gps(void);
 pthread_t getGPS_thread;
 int gps_thread;
-#define NUM_THREAD 1
-
+extern int gps_info_lock;
 #include <sys/time.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -717,11 +684,18 @@ int main(int argc, char **argv)
 
 					/* log CAN frame with absolute timestamp & device */
 					sprint_canframe(buf, &frame, 0, maxdlen);
-					fprintf(logfile, "%010ld.%06ld %*s %s %f\n",
+					/* lock gps_info values */
+					gps_info_lock = 1;
+					/* write to logfile  */
+					fprintf(logfile, "%010ld.%06ld %*s %s %f %d %f %f %d\n",
 						tv.tv_sec, tv.tv_usec,
 						max_devname_len, devname[idx], buf,
-					        gps_info.time	
+					        gps_info.time, 	gps_info.mode,
+						gps_info.latitude, gps_info.longitude,
+						gps_info.rec_num,gps_info.satellites_num
 						);
+					/* unlock gps_info values */
+					gps_info_lock = 0;
 				}
 
 				if ((logfrmt) && (silent == SILENT_OFF)){
