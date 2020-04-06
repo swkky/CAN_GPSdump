@@ -48,7 +48,7 @@ for (;;) {
 				gps_info.longitude = gps_data.fix.longitude;
 				gps_info.speed = gps_data.fix.speed;
 				gps_info.climb = gps_data.fix.climb;
-#ifdef DEBUG		       
+		       /*
 			       	printf("\n--- GPS[DEBUG] ---\n");
 				printf("gps_data.online:           %f\n", gps_data.online);
 				printf("gps_info.time:             %10.0f\n", gps_info.time);
@@ -69,7 +69,7 @@ for (;;) {
 				printf("gps_data.attitude.xy:      %f\n", gps_data.attitude.acc_y);
 				printf("gps_data.attitude.vz:      %f\n", gps_data.attitude.acc_z);
 				printf("gps_data.dop.pdop:         %f\n", gps_data.dop.pdop);
-#endif	  			
+	  		*/	
 				}
                         }
                 }
