@@ -14,6 +14,7 @@ typedef struct GPS_info{
 	double latitude;
 	double longitude;
 	double speed;
+	double track;
 	double climb;
 } gps_t;
 
@@ -47,6 +48,7 @@ for (;;) {
 				gps_info.latitude = gps_data.fix.latitude;
 				gps_info.longitude = gps_data.fix.longitude;
 				gps_info.speed = gps_data.fix.speed;
+				gps_info.track = gps_data.fix.track;
 				gps_info.climb = gps_data.fix.climb;
 		       /*
 			       	printf("\n--- GPS[DEBUG] ---\n");

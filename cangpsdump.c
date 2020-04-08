@@ -688,12 +688,14 @@ int main(int argc, char **argv)
 					/* lock gps_info values */
 					gps_info_lock = 1;
 					/* write to logfile  */
-					fprintf(logfile, "%010ld.%06ld %*s %s %f %d %f %f %d\n",
+					fprintf(logfile, "%010ld.%06ld %*s %s %f %d %f %f %d %f %f %f %d\n",
 						tv.tv_sec, tv.tv_usec,
 						max_devname_len, devname[idx], buf,
 					        gps_info.time, 	gps_info.mode,
 						gps_info.latitude, gps_info.longitude,
-						gps_info.rec_num,gps_info.satellites_num
+						gps_info.satellites_num,
+						gps_info.speed, gps_info.track,
+						gps_info.climb, gps_info.rec_num
 						);
 					/* unlock gps_info values */
 					gps_info_lock = 0;
