@@ -685,20 +685,37 @@ int main(int argc, char **argv)
 
 					/* log CAN frame with absolute timestamp & device */
 					sprint_canframe(buf, &frame, 0, maxdlen);
-					/* lock gps_info values */
-					gps_info_lock = 1;
 					/* write to logfile  */
-					fprintf(logfile, "%010ld.%06ld %*s %s %f %d %f %f %d %f %f %f %d\n",
-						tv.tv_sec, tv.tv_usec,
-						max_devname_len, devname[idx], buf,
-					        gps_info.time, 	gps_info.mode,
-						gps_info.latitude, gps_info.longitude,
-						gps_info.satellites_num,
-						gps_info.speed, gps_info.track,
-						gps_info.climb, gps_info.rec_num
-						);
-					/* unlock gps_info values */
-					gps_info_lock = 0;
+					/* [0] = CAN receive time, [1] = can0, [2] = CANdata,
+					   [3] = GPS fix time, [4] = GPS mode(0-3),
+					   [5] = latitude, [6] = longitude,   
+					   [7] = altitude,
+					   [8] = GPS speed, [9] = track,
+					   [10] = climb, [11] = GPS fix time number  
+					    */
+					if (gps_info_lock == 0){
+						fprintf(logfile, "%010ld.%06ld %*s %s %f %d %f %f %d %f %f %f %d\n",
+							tv.tv_sec, tv.tv_usec,
+							max_devname_len, devname[idx], buf,
+					        	gps_info.time, 	gps_info.mode,
+							gps_info.latitude, gps_info.longitude,
+							gps_info.altitude,
+							gps_info.speed, gps_info.track,
+							gps_info.climb, gps_info.rec_num
+							);
+					}
+					else{
+						fprintf(logfile, "%010ld.%06ld %*s %s %f %d %f %f %d %f %f %f %d\n",
+							tv.tv_sec, tv.tv_usec,
+							max_devname_len, devname[idx], buf,
+					        	before_gps_info.time, 	before_gps_info.mode,
+							before_gps_info.latitude, before_gps_info.longitude,
+							before_gps_info.altitude,
+							before_gps_info.speed, before_gps_info.track,
+							before_gps_info.climb, before_gps_info.rec_num
+							);
+					}
+					
 				}
 
 				if ((logfrmt) && (silent == SILENT_OFF)){

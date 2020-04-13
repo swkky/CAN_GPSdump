@@ -7,19 +7,18 @@
 
 typedef struct GPS_info{
 	double time;
-	int status;
 	int mode;
-	int rec_num;
-	int satellites_num;
 	double latitude;
 	double longitude;
+	double altitude;
 	double speed;
 	double track;
 	double climb;
+	int rec_num;
 } gps_t;
 
-
 struct GPS_info gps_info;
+struct GPS_info before_gps_info;
 int gps_info_lock = 0;
 int record_num = 0;
 
@@ -38,19 +37,21 @@ for (;;) {
 		if (gps_read(&gps_data) == -1 || 0) {
 			printf("Read GPS error\n");
 		} else {
-			if (gps_data.set && gps_info_lock == 0) {
+			if (gps_data.set) {
 				record_num += 1;
+				gps_info_lock = 1;
 				gps_info.time = gps_data.online;
-				gps_info.status = gps_data.status;
 				gps_info.mode = gps_data.fix.mode;
-				gps_info.rec_num = record_num;
-				gps_info.satellites_num = gps_data.satellites_used;
 				gps_info.latitude = gps_data.fix.latitude;
 				gps_info.longitude = gps_data.fix.longitude;
+				gps_info.altitude = gps_data.fix.altitude;
 				gps_info.speed = gps_data.fix.speed;
 				gps_info.track = gps_data.fix.track;
 				gps_info.climb = gps_data.fix.climb;
-		       /*
+				gps_info.rec_num = record_num;
+				gps_info_lock = 0;
+				before_gps_info = gps_info;
+		     /* 
 			       	printf("\n--- GPS[DEBUG] ---\n");
 				printf("gps_data.online:           %f\n", gps_data.online);
 				printf("gps_info.time:             %10.0f\n", gps_info.time);
@@ -71,7 +72,7 @@ for (;;) {
 				printf("gps_data.attitude.xy:      %f\n", gps_data.attitude.acc_y);
 				printf("gps_data.attitude.vz:      %f\n", gps_data.attitude.acc_z);
 				printf("gps_data.dop.pdop:         %f\n", gps_data.dop.pdop);
-	  		*/	
+	  		*/
 				}
                         }
                 }
