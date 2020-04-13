@@ -18,9 +18,9 @@ typedef struct GPS_info{
 } gps_t;
 
 struct GPS_info gps_info;
-struct GPS_info before_gps_info;
 int gps_info_lock = 0;
 int record_num = 0;
+int before_gps_rec_num = -1;
 
 void get_gps(void)
 {
@@ -50,7 +50,6 @@ for (;;) {
 				gps_info.climb = gps_data.fix.climb;
 				gps_info.rec_num = record_num;
 				gps_info_lock = 0;
-				before_gps_info = gps_info;
 		     /* 
 			       	printf("\n--- GPS[DEBUG] ---\n");
 				printf("gps_data.online:           %f\n", gps_data.online);

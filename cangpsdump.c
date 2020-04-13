@@ -693,7 +693,14 @@ int main(int argc, char **argv)
 					   [8] = GPS speed, [9] = track,
 					   [10] = climb, [11] = GPS fix time number  
 					    */
-					if (gps_info_lock == 0){
+					/* this if is don't need write GPS data */
+					if (gps_info.rec_num == before_gps_rec_num){
+						fprintf(logfile, "%010ld.%06ld %*s %s\n",
+							tv.tv_sec, tv.tv_usec,
+							max_devname_len, devname[idx], buf
+							);
+					}
+					else if (gps_info_lock == 0 && gps_info.rec_num != before_gps_rec_num){
 						fprintf(logfile, "%010ld.%06ld %*s %s %f %d %f %f %d %f %f %f %d\n",
 							tv.tv_sec, tv.tv_usec,
 							max_devname_len, devname[idx], buf,
@@ -703,19 +710,14 @@ int main(int argc, char **argv)
 							gps_info.speed, gps_info.track,
 							gps_info.climb, gps_info.rec_num
 							);
+						before_gps_rec_num = gps_info.rec_num;
 					}
 					else{
-						fprintf(logfile, "%010ld.%06ld %*s %s %f %d %f %f %d %f %f %f %d\n",
+						fprintf(logfile, "%010ld.%06ld %*s %s %d\n",
 							tv.tv_sec, tv.tv_usec,
-							max_devname_len, devname[idx], buf,
-					        	before_gps_info.time, 	before_gps_info.mode,
-							before_gps_info.latitude, before_gps_info.longitude,
-							before_gps_info.altitude,
-							before_gps_info.speed, before_gps_info.track,
-							before_gps_info.climb, before_gps_info.rec_num
+							max_devname_len, devname[idx], buf, gps_info_lock
 							);
 					}
-					
 				}
 
 				if ((logfrmt) && (silent == SILENT_OFF)){
